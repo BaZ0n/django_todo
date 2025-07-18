@@ -1,0 +1,92 @@
+.pageCont {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .tasksColumn {
+        padding: 5vh 5vw;
+        width: 40%;
+        height: 100vh;
+        border-right: 1px solid black;
+        display: flex;
+        flex-direction: column;
+
+        h1 {
+            align-self: center;
+        }
+
+        .createTaskBTN {
+            align-self: center;
+            width: 80%;
+            margin: 5vh 0;
+            height: 5vh;
+            border-radius: 20px;
+        }
+    }
+
+    .taskColumn {
+        padding: 5vh 5vw;
+        width: 60%;
+        height: 100vh;
+    }
+}
+
+.createTaskForm {
+    display: flex;
+    flex-direction: column;
+
+    .form-input {
+        border-radius: 10px;
+        padding: 5px 10px;
+        margin: 5px;
+    }
+
+    .deadLineContainer {
+        display: flex;
+        align-items: center;
+        margin: 20px;
+
+        h6 {
+            margin: 0;
+            margin-right: 20px;
+        }
+    }
+
+    .form-button {
+        margin: 20px 0;
+        padding: 10px;
+        border-radius: 20px;
+        width: 50%;
+        align-self: center;
+    }
+
+    .priorityCont {
+        display: flex;
+        flex-direction: row;
+        align-self: center;
+
+        .radioCont {
+            display: flex;
+            flex-direction: column;
+            margin: 0 1vw;
+        }
+    }
+
+    .usersContainer {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        
+        .user-list {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            border-radius: 20px;
+            padding: 5px;
+
+            .user {
+                border-radius: 8px;
+            }
+        }
+    }
+}
