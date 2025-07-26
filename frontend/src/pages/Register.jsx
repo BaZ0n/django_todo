@@ -20,7 +20,7 @@ function Register() {
         if (alertVisible) {
             const timer = setTimeout(() => {
                 showAlert(false)
-            }, 1000)
+            }, 2000)
             return () => clearTimeout(timer)
         }
     }, [alertVisible]);
@@ -40,7 +40,7 @@ function Register() {
             }
         }
         else {
-            setErrorText("Error! Your passwords don't match.")
+            setErrorText("Ошибка! Пароли не совпадают.")
             showAlert(true)
         }
     }
@@ -62,41 +62,50 @@ function Register() {
         <div className="logSignInContainer">
             {alertVisible && <Alert className="alert" variant="danger">{errorText}</Alert>}
             <form onSubmit={handleSubmit} className="form-container">
-            <h1>Sign In</h1>
-            <input
-                className="form-input"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-            />
-            <input
-                className="form-input"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-            />
-            <input 
-                className="form-input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            <input 
-                className="form-input"
-                type="password"
-                value={password_repeat}
-                onChange={(e) => setPasswordRepeat(e.target.value)}
-                placeholder="Repeat your password"
-            />
+            <h1>Регистрация</h1>
+            <div className="form-el">
+                <input
+                    className="form-input"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <label className={email.length == 0 ? "input-label" : "input-filled"}>Почта</label>
+            </div>
+            <div className="form-el">
+                <input
+                    className="form-input"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <label className={username.length == 0 ? "input-label" : "input-filled"}>Имя пользователя</label>
+            </div>
+            <div className="form-el">
+                <input 
+                    className="form-input"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <label className={password.length == 0 ? "input-label" : "input-filled"}>Пароль</label>
+            </div>
+            <div className="form-el">
+                <input 
+                    className="form-input"
+                    type="password"
+                    value={password_repeat}
+                    onChange={(e) => setPasswordRepeat(e.target.value)}
+                />
+                <label className={password_repeat.length == 0 ? "input-label" : "input-filled"}>Повторите пароль</label>
+            </div>
             {loading && <LoadingIndicator />}
             <button className="form-button" type="submit">
-                Registrate
+                Зарегестрироваться
             </button>
         </form>
-            <button className="signInBTN" onClick={logInClick}>Log In</button>
+            <button className="logInBTN" onClick={logInClick}>Уже есть аккаунт?</button>
+            
         </div>        
     )
 }

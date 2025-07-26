@@ -28,6 +28,7 @@ class Subtask(models.Model):
     title = models.TextField(max_length=100, null=False)
     priority = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
+    worker = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     end_at = models.DateTimeField()
     task = models.ForeignKey(Task, on_delete=models.CASCADE)

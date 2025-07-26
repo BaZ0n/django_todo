@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from .serializers import UserSerializer, TaskSerializer, SubtaskSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Task, Subtask
 from django.db import models
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 # Create your views here.
 
@@ -15,33 +16,43 @@ class CreateUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 class UsersListView(generics.ListAPIView):
-    # queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_queryset(self):
         queryset = User.objects.all()
-        # searchQuery = self.request.GET.get('search_user', '')
-        searchQuery = self.request.query_params.get('search_user')
-        print(searchQuery)
-
-        if (searchQuery):
-            queryset = queryset.filter(username__icontains=searchQuery)
-
         return queryset
+    
+class UserDetailView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_field = 'id'
 
-class TasksListCreate(generics.ListCreateAPIView):
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return Task.objects.filter(workers=user)
+    @action(detail=True, methods=['put', 'patch'])
+    def update_partial(self, request, pk=None):
+        task = self.get_object()
+        serializer = self.get_serializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
     
+    @action(detail=True, methods=['get'])
+    def element(self, request, pk=None):
+        task = self.get_object()
+        serializer = self.get_serializer(task)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         if serializer.is_valid():
             serializer.save(author=self.request.user)
         else:
             print(serializer.errors)
+        
+    
 
 class TaskDelete(generics.DestroyAPIView):
     serializer_class = TaskSerializer
@@ -50,25 +61,3 @@ class TaskDelete(generics.DestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Task.objects.filter(workers=user)
-
-# class NoteDelete(generics.DestroyAPIView):
-#     serializer_class = NoteSerializer
-#     permission_classes = [IsAuthenticated]
-    
-#     def get_queryset(self):
-#         user = self.request.user
-#         return Note.objects.filter(author=user)
-    
-# class NoteListCreate(generics.ListCreateAPIView):
-#     serializer_class = NoteSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         user = self.request.user
-#         return Note.objects.filter(author=user)
-    
-#     def perform_create(self, serializer):
-#         if serializer.is_valid():
-#             serializer.save(author=self.request.user)
-#         else:
-#             print(serializer.errors)

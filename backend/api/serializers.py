@@ -21,11 +21,11 @@ class UserSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        exclude = 
+        # exclude = 
         fields = ["id", "title", "description", "priority", "status", "author", "workers", "created_at", "end_at"]
         extra_kwargs = {"author": {"read_only": True}}
 
 class SubtaskSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ["id", "title", "priority", "status", "created_at", "end_at", "task"]
+        fields = ["id", "title", "priority", "status", "worker", "created_at", "end_at", "task"]
         extra_kwargs = {"author": {"read_only": True}}

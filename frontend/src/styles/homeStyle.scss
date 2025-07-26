@@ -4,12 +4,15 @@
     display: flex;
 
     .tasksColumn {
-        padding: 5vh 5vw;
+        padding: 5vh 3vw;
         width: 40%;
         height: 100vh;
         border-right: 1px solid black;
         display: flex;
         flex-direction: column;
+        transition: all .2s ease;
+        background: linear-gradient(to right, var(--secondary-color), 10vw, var(--background-color));
+        overflow-y: auto;
 
         h1 {
             align-self: center;
@@ -17,10 +20,20 @@
 
         .createTaskBTN {
             align-self: center;
-            width: 80%;
-            margin: 5vh 0;
-            height: 5vh;
+            min-height: 15vh;
+            min-width: 10vw;
+            padding: 5px 20px;
             border-radius: 20px;
+            margin: 10px;
+            background-color: var(--gray);
+            color: black;
+            font-size: large;
+            transition: all .2s linear;
+
+            &:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 5px 5px var(--secondary-color);
+            }
         }
     }
 
@@ -28,17 +41,56 @@
         padding: 5vh 5vw;
         width: 60%;
         height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 0;
+        overflow-y: auto;
     }
 }
 
 .createTaskForm {
     display: flex;
+    position: relative;
     flex-direction: column;
+    background-color: white;
+    margin: 30px auto;
+    width: 50%;
+    padding: 20px;
+    border-radius: 20px;
+    z-index: 5;
+    position: relative;
+
+    .createTaskTitle {
+        align-self: center;
+        margin-bottom: 40px;
+    }
 
     .form-input {
-        border-radius: 10px;
-        padding: 5px 10px;
-        margin: 5px;
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        align-self: center;
+        border: 0;
+        border-bottom: solid 1px gray;
+        outline: none;
+        z-index: 2;
+        background-color: transparent;
+    }
+
+    .users-input {
+        border-radius: 5px;
+        width: 100%;
+        padding: 8px 0;
+        align-self: center;
+        border: 0;
+        z-index: 2;
+        background-color: transparent;
+        transition: all .2s linear;
+    }
+
+    textarea {
+        height: 100px;
     }
 
     .deadLineContainer {
@@ -50,10 +102,34 @@
             margin: 0;
             margin-right: 20px;
         }
-    }
 
+        .form-date {
+            display: relative;
+            width: 100%;
+
+            input {
+                width: 100%;
+                border-radius: 5px;
+                padding: 10px;
+                border: 0;
+                border-bottom: 1px solid black;
+                outline: 0;
+            }
+
+        }
+
+        .datepicker-label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            color: gray;
+            z-index: 1;
+        }
+    }
+    
+    
     .form-button {
-        margin: 20px 0;
+        margin: 30px 0;
         padding: 10px;
         border-radius: 20px;
         width: 50%;
@@ -64,6 +140,7 @@
         display: flex;
         flex-direction: row;
         align-self: center;
+        margin: 10px 0;
 
         .radioCont {
             display: flex;
@@ -76,17 +153,223 @@
         display: flex;
         flex-direction: column;
         position: relative;
-        
-        .user-list {
-            position: absolute;
-            top: 40px;
-            width: 100%;
-            border-radius: 20px;
-            padding: 5px;
+        margin: 15px 0;
+    }
+}
 
-            .user {
-                border-radius: 8px;
+.createTaskContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.46);
+}
+
+.form-el {
+    display: flex;
+    align-self: center;
+    position: relative;
+    width: 80%;
+    margin: 10px 20px;
+
+    .input-label {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        transition: all .2s linear;
+        color: gray;
+        z-index: 1;
+    }
+
+    .form-input:focus + .input-label{
+        top: -12px;
+        color: black;
+        z-index: 3;
+    }
+
+    .form-input:focus + .input-filled {
+        color: black;
+    }
+
+}
+
+.input-filled {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    transition: all .2s linear;
+    color: gray;
+    z-index: 1;
+}
+
+
+.react-datepicker__tab-loop {
+    z-index: 4;
+}
+
+.backgroundContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.taskColumn {
+    .head {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .task-form {
+        .form-element {
+            position: relative;
+            margin: 50px;
+
+            .form-date {
+                width: 100%;
+            }
+
+            textarea {
+                width: 100%;
+                height: 20vh;
+                background-color: transparent;
+                border: 0;
+                border-radius: 20px;
+                outline: none;
+                transition: all .2s linear;
+                color: white;
+                font-size: larger;
+                border: 1px solid var(--gray);
+                padding: 15px;
+                position: relative;
+                z-index: 1;
+
+                &:hover {
+                    border: 1px solid var(--secondary-color);
+                }
+
+                &:focus + .label-input {
+                    top: -11px;
+                    left: 30px;
+                    background-color: var(--background-color);
+                    font-size: medium;
+                    z-index: 2;
+                }
+            }
+
+            .form-input {
+                background-color: transparent;
+                position: relative;
+                display: flex;
+                border: 0;
+                width: 100%;
+                border-radius: 4px;
+                padding: 5px 20px;
+                outline: 0;
+                border-bottom: 1px solid var(--gray);
+                color: white;
+                font-size: xx-large;
+                z-index: 1;
+
+                &:focus + .label-input {
+                    top: -11px;
+                    left: 30px;
+                    font-size:medium;
+                }
+            }
+
+            .label-input {
+                color: white;
+                position: absolute;
+                top: 15px;
+                left: 40px;
+                font-size: x-large;
+                transition: all .2s linear;
+                z-index: 0;
+            }
+
+            .filled-input {
+                top: -11px;
+                left: 30px;
+                background-color: var(--background-color);
+                font-size: medium;
+                color: white;
+                position: absolute;
+                z-index: 2;
             }
         }
     }
+
+    .dateContainer {
+    }
+
+    .dropdown-container {
+        position: fixed;
+        bottom: 10vh;
+        right: 3vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .relativeCont {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            .dropdown_menu-button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                border: 0;
+                height: 50px;
+                width: 50px;
+                background-color: var(--gray);
+                transition: all .2s linear;
+                
+                &:hover {
+                    box-shadow: 0 0 5px 1px var(--secondary-color);
+                    background-color: var(--primary-color);
+                }
+
+                p {
+                    padding: 0;
+                    margin: 0;
+                }
+            }
+
+            .dropdown_menu {
+                display: flex;
+                position: absolute;
+                bottom: -60px;
+                right: -25px;
+                flex-direction: column;
+                color: white;   
+                list-style-type: none;
+                padding: 0;
+                background-color: var(--background-color);
+                border: 1px solid var(--primary-color);
+                padding: 10px;
+                border-radius: 10px;
+                
+                .dropdown_menu-element {
+                    padding: 0;
+                    margin: 5px 0;
+                    border-bottom: 1px solid var(--background-color);
+                    transition: all .2s linear;
+
+                    &:hover {
+                        color: var(--primary-color);
+                        cursor: pointer;
+                        border-color: var(--primary-color);
+                    }
+                }
+            }
+        }
+    }
+    
 }

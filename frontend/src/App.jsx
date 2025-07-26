@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import "../src/styles/main.scss"
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Navbar from "./components/Navbar"
 
 
 function Logout() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={
           <ProtectedRoute>
             <Home />
+            <Navbar />
           </ProtectedRoute>
         }/>
         <Route path="/login" element={<Login />}/>
