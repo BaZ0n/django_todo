@@ -1,38 +1,37 @@
-import React, { useEffect, useState } from "react";
+import react, { useEffect, useState } from "react"
+import Datepicker, { registerLocale } from "react-datepicker"
 import api from "../api";
 import Select from 'react-select'
-import makeAnimated from 'react-select/animated';
-import LoadingIndicator from "./LoadingIndicator";
-import Datepicker, { registerLocale } from 'react-datepicker'   
-import "react-datepicker/dist/react-datepicker.css";
+import makeAnimated from 'react-select/animated'
+import LoadingIndicator from "./LoadingIndicator"
+import "react-datepicker/dist/react-datepicker.css"
 import ru from 'date-fns/locale/ru'
-import ReactDOM from 'react-dom'
-import { motion } from "motion/react";
 
-registerLocale('ru', ru )
+registerLocale('ru', ru)
 
-function CreateTask() {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    // const [searchQuery, setSearch] = useState("")
-    const [priority, setPriority] = useState(1)
-    const [workers, selectWorkers] = useState([])
-    const [endDate, setEndDate] = useState(new Date());
-
-    const [users, setUsers] = useState([])
-    const [onLoading, setLoading] = useState(false)
+function CreateSubtask ({task}) {
+    
     const animatedComponents = makeAnimated()
-    const [isVisible, setVisible] = useState(true)
 
-    const animationVariants = {
-        hidden: {
-            opacity: 0,
-            x: -500,
-        },
-        visible: {
-            opacity: 1,
-            x: 0,
-        }
+    const [title, setTitle] = useState("")
+    const [priority, setPriority] = useState(0)
+    const [users, setUsers] = useState([])
+    const [workers, selectWorkers] = useState()
+    const [endDate, setEndDate] = useState(new Date())
+    const [isLoading, setLoading] = useState(false)
+
+    const handleChangePriority = (e) => {
+        setPriority(e.target.value)
+    }
+
+    const handleDateChanged = (e) => {
+        setEndDate(e)
+    }
+    
+    const handleSelectChange = (selectedUsers) => {
+        console.log(selectedUsers)
+        const selectedIDs = selectedUsers.value
+        selectWorkers(selectedIDs)
     }
 
     useEffect(() => {
@@ -41,7 +40,7 @@ function CreateTask() {
 
     const getUsers = async() => {
         api 
-            .get("/api/users/")
+            .get("/api/users/get")
             .then((result) => result.data)
             .then((data) => {
                 const formattedUsers = data.map(user => ({
@@ -58,9 +57,9 @@ function CreateTask() {
         e.preventDefault()
         setLoading(true)
         try {
-            const result = await api.post("/api/content/tasks/", {title, description, priority, workers, end_at: endDate})
+            const result = await api.post("/api/content/subtasks/", {title, priority, worker: workers, end_at: endDate, task: task.id})
             if (result.status === 201) {
-                alert("Task Created!")
+                alert("Subtask Created!")
             } 
             else {
                 alert("Error")
@@ -74,58 +73,26 @@ function CreateTask() {
         }
     }
 
-    const handleSelectChange = (selectedUsers) => {
-        console.log(selectedUsers)
-        const selectedIDs = selectedUsers.map(user => user.value)
-        selectWorkers(selectedIDs)
-    }
-
-    const handleChangePriority = (e) => {
-        setPriority(e.target.value)
-    }
-
-    const handleDateChanged = (e) => {
-        setEndDate(e)
-    }
-
-    const closeWindow = () => {
-        setVisible(false)
-    }
-
     return (
         <div className="createTaskContainer">
-            <motion.form className="createTaskForm" onSubmit={handleSubmit}
-            initial="hidden"
-            animate="visible"
-            variants={animationVariants}
-            transition={{duration: 0.5}}>
-                <h3 className="createTaskTitle">Создание задачи</h3>
+            <form className="createTaskForm" onSubmit={handleSubmit}>
+                <h3 className="createTaskTitle">Создание подзадачи</h3>
                 <div className="form-el">
-                    <input 
-                        className="form-input" 
+                    <input
+                        className="form-input"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
                     <label className={title.length == 0 ? "input-label" : "input-filled"}>Заголовок</label>
                 </div>
-                <div className="form-el">
-                    <textarea 
-                        className="form-input"
-                        type="text"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}    
-                    />
-                    <label className={description.length == 0 ? "input-label" : "input-filled"}>Описание</label>    
-                </div>
                 <div className="usersContainer form-el">
                     <Select
                         className="users-input"
                         classNamePrefix="user-select"
-                        closeMenuOnSelect={false}
+                        closeMenuOnSelect={true}
                         components={animatedComponents}
                         options={users}
-                        isMulti
                         placeholder=""
                         onChange={handleSelectChange}
                         styles={{
@@ -148,7 +115,7 @@ function CreateTask() {
                             }),
                         }}
                     />
-                    <label className={workers.length == 0 ? "input-label" : "input-filled"}>Выберите пользователей</label>
+                    <label className={workers == 0 ? "input-label" : "input-filled"}>Выберите пользователей</label>
                 </div>
                 <div className="deadLineContainer form-el">
                     <Datepicker
@@ -203,10 +170,10 @@ function CreateTask() {
                 <button className="form-button" type="submit">
                     Create
                 </button>
-            </motion.form>
-            <div className="backgroundContainer" onClick={closeWindow}></div>
+            </form>
         </div>
     )
+    
 }
 
-export default CreateTask;
+export default CreateSubtask

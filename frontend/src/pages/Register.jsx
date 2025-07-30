@@ -3,7 +3,7 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import LoadingIndicator from "../components/LoadingIndicator";
-import Alert from 'react-bootstrap/Alert';
+import AlertMessage from "../components/AlertMessage";
 
 function Register() {
 
@@ -13,35 +13,57 @@ function Register() {
     const [password_repeat, setPasswordRepeat] = useState("");
     const [loading, setLoading] = useState(false);
     const [alertVisible, showAlert] = useState(false);
+    const [alertType, setAlertType] = useState("")
     const [errorText, setErrorText] = useState("");
+    const [isCorrectlyForm, setFormCorrectly] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
         if (alertVisible) {
             const timer = setTimeout(() => {
                 showAlert(false)
-            }, 2000)
+            }, 5000)
             return () => clearTimeout(timer)
         }
     }, [alertVisible]);
 
+    const checkForm = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (password.length < 8) {
+            setErrorText("Пароль должен быть не меншье 8 символов")
+            setAlertType("danger")
+            showAlert(true)
+        } else if (password != password_repeat) {
+            setErrorText("Пароли не совпадают.")
+            setAlertType("danger")
+            showAlert(true)
+        } else if (!emailRegex.test(email)) {
+            setErrorText("Неправильно заполнена почта")
+            setAlertType("danger")
+            showAlert(true)
+        }
+        else {
+            setFormCorrectly(true)
+        }
+    }
+
     const handleSubmit = async (e) => {
+        checkForm()
         e.preventDefault()
-        if (password === password_repeat) {
+        if (isCorrectlyForm) {
             setLoading(true);
             e.preventDefault();
             try {
                 const result = await api.post("/api/user/register/", {email, username, password});
                 navigate("/login")
             } catch(error) {
-                alert(error);
+                console.log(error)
+                setErrorText("Упс, ошибка")
+                setAlertType("danger")
+                showAlert(true)
             } finally {
                 setLoading(false);
             }
-        }
-        else {
-            setErrorText("Ошибка! Пароли не совпадают.")
-            showAlert(true)
         }
     }
 
@@ -58,9 +80,13 @@ function Register() {
         }
     }
 
+    const handleAlertClose = () => {
+        showAlert(false)
+    }
+
     return (
         <div className="logSignInContainer">
-            {alertVisible && <Alert className="alert" variant="danger">{errorText}</Alert>}
+            {alertVisible && <AlertMessage type={alertType} errorText={errorText} onClose={handleAlertClose}></AlertMessage>}
             <form onSubmit={handleSubmit} className="form-container">
             <h1>Регистрация</h1>
             <div className="form-el">

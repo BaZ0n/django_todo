@@ -28,10 +28,14 @@ class Subtask(models.Model):
     title = models.TextField(max_length=100, null=False)
     priority = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
-    worker = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
+    worker = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     end_at = models.DateTimeField()
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="task")
 
     def __str__(self):
-        return self.title    
+        return self.title   
+
+class Friends(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    friend_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friend") 

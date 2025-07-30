@@ -1,0 +1,11 @@
+.Alert-container {
+    position: fixed;
+    right: 2vw;
+    top: 3vh;
+    width: fit-content;
+    height: fit-content;
+
+    .alert {
+        width: 10vw;
+    }
+}

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import Alert from 'react-bootstrap/Alert';
+import AlertMessage from "../components/AlertMessage";
 
 
 function Login() {
@@ -11,17 +11,9 @@ function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [alertVisible, showAlert] = useState(false);
+    const [alertType, setAlertType] = useState("")
     const [errorText, setErrorText] = useState("");
     const navigate = useNavigate()
-
-    useEffect(() => {
-        if (alertVisible) {
-            const timer = setTimeout(() => {
-                showAlert(false)
-            }, 2000)
-            return () => clearTimeout(timer)
-        }
-    }, [alertVisible]);
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -35,10 +27,12 @@ function Login() {
         } catch(error) {
             if (error.status === 401) {
                 setErrorText("Ошибка входа. Аккаунт не найден.")
+                setAlertType("danger")
                 showAlert(true)
             }
             else if (error.status === 400) {
-                setErrorText("Ошибка входа. Заполнены не все поля.")
+                setErrorText("Все поля должны быть заполнены")
+                setAlertType("danger")
                 showAlert(true)
             }
         } finally {
@@ -59,9 +53,13 @@ function Login() {
         }
     }
 
+    const handleAlertClose = () => {
+        showAlert(false)
+    }
+
     return ( 
         <div className="logSignInContainer">
-            {alertVisible && <Alert className="alert" variant="danger">{errorText}</Alert>}
+            {alertVisible && <AlertMessage type={alertType} errorText={errorText} onClose={handleAlertClose}></AlertMessage>}
             <form onSubmit={handleSubmit} className="form-container">
                 <h1>Авторизация</h1>
                 <div className="form-el">

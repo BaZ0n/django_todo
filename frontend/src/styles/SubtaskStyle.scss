@@ -1,0 +1,142 @@
+.subTaskContainer {
+    width: 100%;
+    height: 100%;
+
+    .title {
+        color: white;
+    } 
+
+    .createSubtask {
+        display: flex;
+        width: 50%;
+        height: 5vh;
+        margin: 20px auto;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+        background-color: var(--gray);
+        border: 0;
+        transition: all 0.2s linear;
+
+        &:hover {
+            background-color: var(--secondary-color);
+            box-shadow: 0 0 5px 1px var(--primary-color);
+        }
+    }
+
+    .subtask-list {
+        padding: 0 50px;
+
+
+        .subtask-element {
+            color: white;
+            padding: 10px 30px;
+            margin: 15px 0;
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: space-between;
+            border: 4px solid var(--normal_priority-color);
+            box-shadow: inset 1px 1px 5px var(--normal_priority-color);
+            border-radius: 20px;
+            z-index: 1;
+            height: 12vh;
+            transition: all .2s linear;
+
+            .subtask-front {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                transition: all .2s linear;
+
+                .subtask-info {
+                    display: flex;
+                    align-items: center;
+                    width: 100%;    
+                    justify-content: space-between;
+
+                    .subtask-worker {
+                        color: gray;
+                    }
+
+                }
+            }
+
+            &:hover .subtask-front {
+                display: none;
+                opacity: 0;
+            }
+
+            &:hover .subtask-back {
+                display: flex;
+                transform: translateY(-50px);
+                opacity: 1;
+            }
+
+            .subtask-back {
+                display: flex;
+                position: absolute;
+                top: 50px;
+                opacity: 0;
+                height: 100%;
+                width: 90%;
+                transition: all .2s linear;
+                align-items: center;
+                justify-content: space-between;
+
+                .subtask-date {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    .subtask-start {
+                        color: gray;
+                        text-align: center;
+                    }
+                }
+
+                .subtask-menu {
+                    position: relative;
+                    .dropdown-btn {
+                        background-color: transparent;
+                        border: 0;
+                        width: 36px;
+                        height: 36px;
+                        fill: white;
+                        cursor: pointer;
+                        transition: all .2s linear;
+
+                        &:hover {
+                            fill: var(--primary-color);
+                        }
+                    }
+
+                    .dropdown_menu {
+                        border: 1px solid var(--secondary-color);
+                        border-radius: 20px;
+                        list-style-type: none;
+                        position: absolute;
+                        bottom: -7vh;
+                        left: 3vw;
+                        width: 8vw;
+                        padding: 5px 10px;
+                        background-color: var(--background-color);
+                        
+                        .list-element {
+                            text-align: center;
+                            margin: 10px 0;
+                            cursor: pointer;
+                            border-bottom: 1px solid gray;
+                            border-radius: 4%;
+
+                            &:hover {
+                                color: var(--primary-color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

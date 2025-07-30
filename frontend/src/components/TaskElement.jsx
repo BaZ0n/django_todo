@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 
-function Task({task}) {
+function TaskElement({task}) {
     const formattedStartDate = new Date(task.created_at).toLocaleDateString("ru-Ru")
     const formattedEndDate = new Date(task.end_at).toLocaleDateString("ru-Ru")
     const [author, setAuthor] = useState([])
@@ -12,7 +12,7 @@ function Task({task}) {
 
     const getAuthor = async() => {
         api 
-            .get(`/api/users/get/${task.author}/`)
+            .get(`/api/users/${task.author}/`)
             .then((result) => result.data)
             .then((data) => {setAuthor(data)})
             .catch((error) => alert(error))
@@ -35,4 +35,4 @@ function Task({task}) {
     )
 }
 
-export default Task;
+export default TaskElement;

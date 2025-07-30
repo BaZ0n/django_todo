@@ -1,44 +1,40 @@
-import { use, useEffect, useState } from "react";
-import api from "../api";
-import Task from "../components/Task"
-import CreateTask from "../components/CreateTask";
-import Select from "react-select"
-import makeAnimated from 'react-select/animated';
+import { act, use, useEffect, useState } from "react"
+import api from "../api"
+import TaskElement from "../components/TaskElement"
+import CreateTask from "../components/CreateTask"
 import { AnimatePresence, motion } from "motion/react"
-import DatePicker from "react-datepicker";
-import axios from "axios";
+import TaskInfo from "../components/TaskInfo"
+import ArrowForward from "../assets/arrow_forward.svg"
+import ArrowBack from "../assets/arrow_back.svg" 
+import Subtask from "../components/Subtask"
+import ArrowDropUp from "../assets/arror_drop_up.svg?react"
+import ArrowDropDown from "../assets/arror_drop_down.svg?react"
 
 function Home() {
-    const priority_options = [
-        {value: 0, label: "Низкий"},
-        {value: 1, label: "Средний"},
-        {value: 2, label: "Высокий"}
-    ]
 
-    const showVariants = {
-        hidden: { opacity: 0 },
-        visible: { 
-            opacity: 1,
-            y: -100
-        }
-    }
-
-    const [tasks, setTasks] = useState([])
     const [createTaskShow, showCreateForm] = useState(false)
     const [task, selectTask] = useState([])
-    const animatedComponents = makeAnimated()
-    const [dropdownMenu, showDropdownMenu] = useState(false)
+    const [isTaskColumnVisible, setTaskColumnVisible] = useState(false)
+    const [isSubtaskPage, setSubtaskPage] = useState(false)
+    const [reanimate, reanimateAnimation] = useState(false)
+    // const [isLoading, setLoading] = useState(false)
+    const [waitingTasks, setWaitingTasks] = useState([])
+    const [activeTasks, setActiveTasks] = useState([])
+    const [completedTasks, setCompletedTasks] = useState([])
+    const [archiveTasks, setArchive] = useState([])
+    // const [burningTasks, setBurningTasks] = useState([])
 
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [priority, setPriority] = useState(0)
-    const [endDate, setEndDate] = useState(new Date())
-    const [workers, setWorkers] = useState([])
-    const [statusText, setStatusText] = useState("Подробно")
+    const [isWaitingListShowed, showWaitingList] = useState(false)
+    const [isActiveListShowed, showActiveList] = useState(false)
+    const [isCompletedListShowed, showCompletedList] = useState(false)
+    const [isArchiveListShowed, showArchiveList] = useState(false)
+    // const [isBurningTasks, showBurningTasks] = useState(false)
+
+    const [reload, reloadPage] = useState(false)
 
     useEffect(() => {
         getTasks()
-    }, [])
+    }, [reload])
 
     const handleCreateTask = () => {
         showCreateForm(true)
@@ -48,78 +44,32 @@ function Home() {
         api 
             .get("/api/content/tasks/")
             .then((result) => result.data)
-            .then((data) => {setTasks(data)})
+            .then((data) => {
+                setWaitingTasks(data.filter((d) => d.status == 0))
+                setActiveTasks(data.filter((d) => d.status == 1))
+                setCompletedTasks(data.filter((d) => d.status == 2))
+                setArchive(data.filter((d) => d.status == 3))
+                // setBurningTasks(data.filter((d) => d.end_at > Date.now))
+            })
             .catch((error) => alert(error))
     }
+    
 
-    const getTask = () => {
-        api
-            .get(`/api/content/tasks/${task.id}/`)
-            .then((result) => result.data)
-            .then((data) => selectTask(data))
-            .catch((error) => alert(error))
-
-        setTitle(task.title)
-        setDescription(task.description)
-        setPriority(task.priority)
-        setEndDate(task.end_at)
-    }
-
-    const handleTaskClicked = (task) => {
+    const handleTaskClicked = (task) => {  
+        setTaskColumnVisible(false)
         selectTask(task)
-        setTitle(task.title)
-        setDescription(task.description)
-        setPriority(task.priority)
-        setEndDate(task.end_at)
-
-        {task.status == 0 
-            ? setStatusText("В ожидании")
-            : task.status == 1 
-            ? setStatusText("В процессе")
-            : task.status == 2
-            ? setStatusText("Завершён")
-            : setStatusText("В архиве")
-        }
+        setTaskColumnVisible(true)
+        reanimateAnimation(!reanimate)
     }
 
-    // const deleteNote = (id) => {
-    //     api.delete(`/api/notes/delete/${id}`).then((result) => {
-    //         if (result.status === 204) alert("Note deleted")
-    //         else alert("Delete failed")
-    //         getNotes()
-    //     }).catch((error) => alert(error)) 
-    // }
-
-    const handleDropdownMenu = () => {
-        {dropdownMenu ? showDropdownMenu(false) : showDropdownMenu(true)}
+    const changePage = () => {
+        reanimateAnimation(!reanimate)
+        setSubtaskPage(!isSubtaskPage)
     }
 
-    const handleDateChanged = (e) => {
-        setEndDate(e)
-    }
-
-    const changeStatus = async(value) => {
-
-        if (task.status == value) {
-            return null
-        }
-
-        api
-            .patch(`/api/content/tasks/${task.id}/update_partial/`, {status: value})
-            // .then((result) => result.data)
-            .catch((error) => alert(error))
-        
-        {task.status+1 == 0 
-            ? setStatusText("В ожидании")
-            : task.status+1 == 1 
-            ? setStatusText("В процессе")
-            : task.status+1 == 2
-            ? setStatusText("Завершён")
-            : setStatusText("В архиве")
-        }
-
+    const reloadFunc = () => {
+        console.log("зашёл")
         getTasks()
-        getTask(task.id)
     }
     
     return (
@@ -127,132 +77,198 @@ function Home() {
             <div className="tasksColumn">
                 <h1 style={{color: "white"}}>Задачи</h1>
                 <hr />
+                <button className="createTaskBTN" onClick={handleCreateTask}>
+                    Создать новую задачу
+                </button>
                 <div className="tasks-container">
-                    <button className="createTaskBTN task-button" onClick={handleCreateTask}>
-                        Создать новую задачу
-                    </button>
-                    {tasks.map((task) => (
-                        <button
-                            key={task.id} 
-                            className="task-button" 
-                            onClick={() => handleTaskClicked(task)}>
-                            <Task task={task}/>
-                        </button>
-                    ))}
+                    <div className="tasks-list">
+                        <div className="tasks-header">
+                            <h3 className="tasks-container-title">В ожидании</h3>
+                            {isWaitingListShowed ? 
+                                <ArrowDropUp
+                                    // src={ArrowDropUp}
+                                    className="showTasksBTN"
+                                    onClick={() => showWaitingList(false)}
+                                /> :
+                                <ArrowDropDown 
+                                    // src={ArrowDropDown}
+                                    className="showTasksBTN"
+                                    onClick={() => showWaitingList(true)}
+                                />
+                            }
+                        </div>
+                        <div className="tasks-table">
+                            <AnimatePresence>
+                                {isWaitingListShowed &&
+                                    waitingTasks.map((task) => (
+                                    <motion.button
+                                        initial={{x: -200, opacity: 0 }}
+                                        animate={{x: 0, opacity: 1}}
+                                        exit={{x: -200, opacity: 0}}
+                                        transition={{duration: 0.3}}
+                                        key={task.id} 
+                                        className="task-button" 
+                                        onClick={() => handleTaskClicked(task)}>
+                                        <TaskElement task={task}/>
+                                    </motion.button>     
+                                ))
+                                }
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                    <div className="tasks-list">
+                        <div className="tasks-header">
+                            <h3 className="tasks-container-title">Активные</h3>
+                            {isActiveListShowed ? 
+                                <ArrowDropUp
+                                    // src={ArrowDropUp}
+                                    className="showTasksBTN"
+                                    onClick={() => showActiveList(false)}
+                                /> :
+                                <ArrowDropDown 
+                                    // src={ArrowDropDown}
+                                    className="showTasksBTN"
+                                    onClick={() => showActiveList(true)}
+                                />
+                            }
+                        </div>
+                        <div className="tasks-table">
+                            <AnimatePresence>
+                                {isActiveListShowed &&
+                                    activeTasks.map((task) => (
+                                    <motion.button
+                                        initial={{x: -200, opacity: 0 }}
+                                        animate={{x: 0, opacity: 1}}
+                                        exit={{x: -200, opacity: 0}}
+                                        transition={{duration: 0.3}}
+                                        key={task.id} 
+                                        className="task-button" 
+                                        onClick={() => handleTaskClicked(task)}>
+                                        <TaskElement task={task}/>
+                                    </motion.button>     
+                                ))
+                                }
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                    <div className="tasks-list">
+                        <div className="tasks-header">
+                            <h3 className="tasks-container-title">Завершённые</h3>
+                            {isCompletedListShowed ? 
+                                <ArrowDropUp
+                                    // src={ArrowDropUp}
+                                    className="showTasksBTN"
+                                    onClick={() => showCompletedList(false)}
+                                /> :
+                                <ArrowDropDown 
+                                    // src={ArrowDropDown}
+                                    className="showTasksBTN"
+                                    onClick={() => showCompletedList(true)}
+                                />
+                            }
+                        </div>
+                        <div className="tasks-table">
+                            <AnimatePresence>
+                                {isCompletedListShowed &&
+                                    completedTasks.map((task) => (
+                                    <motion.button
+                                        initial={{x: -200, opacity: 0 }}
+                                        animate={{x: 0, opacity: 1}}
+                                        exit={{x: -200, opacity: 0}}
+                                        transition={{duration: 0.3}}
+                                        key={task.id} 
+                                        className="task-button" 
+                                        onClick={() => handleTaskClicked(task)}>
+                                        <TaskElement task={task}/>
+                                    </motion.button>     
+                                ))
+                                }
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                    <div className="tasks-list">
+                        <div className="tasks-header">
+                            <h3 className="tasks-container-title">Архив</h3>
+                            {isArchiveListShowed ? 
+                                <ArrowDropUp
+                                    // src={ArrowDropUp}
+                                    className="showTasksBTN"
+                                    onClick={() => showArchiveList(false)}
+                                /> :
+                                <ArrowDropDown 
+                                    // src={ArrowDropDown}
+                                    className="showTasksBTN"
+                                    onClick={() => showArchiveList(true)}
+                                />
+                            }
+                        </div>
+                        <div className="tasks-table">
+                            <AnimatePresence>
+                                {isArchiveListShowed &&
+                                    archiveTasks.map((task) => (
+                                    <motion.button
+                                        initial={{x: -200, opacity: 0 }}
+                                        animate={{x: 0, opacity: 1}}
+                                        exit={{x: -200, opacity: 0}}
+                                        transition={{duration: 0.3}}
+                                        key={task.id} 
+                                        className="task-button" 
+                                        onClick={() => handleTaskClicked(task)}>
+                                        <TaskElement task={task} toReload={reloadFunc}/>
+                                    </motion.button>     
+                                ))
+                                }
+                            </AnimatePresence>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="taskColumn">
-                <div className="head">
-                    <h1 style={{color: "white"}}>{statusText}</h1>
-                </div>
-                <form className="task-form">
-                    <div className="form-element">
-                        <input 
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="form-input" />
-                        <label className={title.length == 0 ? "label-input" : "filled-input"}>Заголовок</label>
+                {(isTaskColumnVisible) && 
+                <AnimatePresence> 
+                    { !isSubtaskPage &&
+                    <motion.div
+                        key={reanimate}
+                        className="animatedContainer"
+                        initial={{opacity: 0}}
+                        animate={{opacity: 1}}
+                        exit={{opacity: 0.5, x: -1000, y: -100}}
+                        transition={{duration: 0.5}}
+                    >
+                        
+                        <TaskInfo task={task}/>
+                    </motion.div>
+                    }
+                </AnimatePresence>
+                }
+                {isTaskColumnVisible &&
+                    <div className={isSubtaskPage 
+                        ? "changeComponentBTN back" 
+                        : "changeComponentBTN forward"} 
+                        onClick={changePage}
+                    >
+                        {isSubtaskPage 
+                        ? <img src={ArrowBack} /> 
+                        : <img src={ArrowForward} />}
                     </div>
-                    <div className="form-element">
-                        <textarea 
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                        <label className={description.length == 0 ? "label-input" : "filled-input"}>Описание</label>
-                    </div>
-                    <div className="usersContainer form-element">
-                        <Select 
-                            options={priority_options}
-                            value={priority_options[priority]}
-                            onChange={(e) => setPriority(e.target.value)}
-                            styles={{
-                                control: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    borderRadius: "10px",
-                                    backgroundColor: "transparent",
-                                    color: "white",
-                                    padding: "10px",
-                                    fontSize: "large"
-                                }),
-                                input: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    color: "white",
-                                }),
-                                singleValue: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    color: state.value == 0 
-                                        ? "var(--low_priority-color)" 
-                                        : state.value == 1 
-                                        ? "var(--normal_priority-color)" 
-                                        : "var(--high_priority-color)", 
-                                }),
-                                menu: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    backgroundColor: "var(--background-color)",
-                                    borderRadius: "10px",
-                                    zIndex: "3"
-                                }),
-                                option: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    color: state.value == 0 
-                                    ? "var(--low_priority-color)" 
-                                    : state.value == 1 
-                                    ? "var(--normal_priority-color)" 
-                                    : "var(--high_priority-color)",
-                                    borderRadius: "10px",
-                                    '&:active': { 
-                                        backgroundColor: state.value == 0 
-                                        ? "var(--low_priority-color)" 
-                                        : state.value == 1 
-                                        ? "var(--normal_priority-color)" 
-                                        : "var(--high_priority-color)", 
-                                    },
-                                    '&:hover': {
-                                        backgroundColor: "var(--gray)"
-                                    }
-                                })
-                            }}
-                        />
-                        <label className={priority.length == 0 ? "input-label" : "filled-input"}>Приоритет</label>
-                    </div>
-                    <div className="dateContainer form-element">
-                        <DatePicker 
-                            className="form-input"
-                            dateFormat={"dd.MM.yyyy HH:mm"}
-                            timeFormat="HH:mm"
-                            showTimeSelect
-                            wrapperClassName="form-date"
-                            selected={endDate}
-                            onChange={handleDateChanged}
-                            onSelect={(e) => setEndDate(e.target.value)}
-                            disabled
-                        />
-                        <label className={endDate.length == 0 ? "input-label" : "filled-input"}>Дедлайн до</label>
-                    </div>
-                </form>
-                <div className="dropdown-container">
-                    <div className="relativeCont">
-                        <AnimatePresence>
-                            { dropdownMenu ? 
-                                <motion.ul
-                                    className="dropdown_menu"
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={showVariants}
-                                    transition={{duration: 0.5}}
-                                >   
-                                    {task.status == 0 ? 
-                                        <li className="dropdown_menu-element" onClick={() => changeStatus(1)}>Начать выполнение</li>
-                                        : <li className="dropdown_menu-element" onClick={() => changeStatus(2)}>Выполнить</li>
-                                    }
-                                    <li className="dropdown_menu-element" onClick={() => changeStatus(3)}>В архив</li>
-                                    <li className="dropdown_menu-element">Отказаться</li>
-                                </motion.ul>
-                            : null}
-                        </AnimatePresence>
-                        <button className="dropdown_menu-button" onClick={handleDropdownMenu}><p>+</p></button>
-                    </div>
-                </div>
+                }
+                {(isTaskColumnVisible) && 
+                    <AnimatePresence>
+                        {isSubtaskPage &&
+                            <motion.div
+                                key={reanimate}
+                                className="animatedContainer"
+                                initial={{opacity: 0}}
+                                animate={{opacity: 1}}
+                                exit={{opacity: 0.5, x: 1000, y: -100}}
+                                transition={{duration: 0.5}}    
+                            >
+                                <Subtask task={task}/>
+                            </motion.div>
+                        }
+                    </AnimatePresence>
+                    
+                }
             </div>
 
             {createTaskShow && 

@@ -7,6 +7,7 @@ from .models import Task, Subtask
 from django.db import models
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.db.models import Q
 
 # Create your views here.
 
@@ -15,22 +16,23 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
-class UsersListView(generics.ListAPIView):
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        queryset = User.objects.all()
-        return queryset
-    
-class UserDetailView(generics.RetrieveAPIView):
-    serializer_class = UserSerializer
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    lookup_field = 'id'
+    serializer_class = UserSerializer
+    permission_classes=[AllowAny]
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Task.objects.all()
+        user = self.request.user
+        queryset = queryset.filter(
+            models.Q(author=user) | models.Q(workers=user)
+        ).distinct()
+        return queryset
 
     @action(detail=True, methods=['put', 'patch'])
     def update_partial(self, request, pk=None):
@@ -51,8 +53,20 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.save(author=self.request.user)
         else:
             print(serializer.errors)
-        
-    
+
+class SubtaskViewSet(viewsets.ModelViewSet):
+    queryset = Subtask.objects.all()
+    serializer_class = SubtaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Subtask.objects.all()
+        taskID = self.request.query_params.get('task_id', None)
+        if taskID is not None:
+            queryset = queryset.filter(task_id = taskID)
+        return queryset
+
+
 
 class TaskDelete(generics.DestroyAPIView):
     serializer_class = TaskSerializer

@@ -1,0 +1,167 @@
+.createTaskForm {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    background-color: white;
+    margin: 30px auto;
+    width: 50%;
+    padding: 20px;
+    border-radius: 20px;
+    z-index: 5;
+    position: relative;
+
+    .createTaskTitle {
+        align-self: center;
+        margin-bottom: 40px;
+    }
+
+    .form-input {
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        align-self: center;
+        border: 0;
+        border-bottom: solid 1px gray;
+        outline: none;
+        z-index: 2;
+        background-color: transparent;
+    }
+
+    .users-input {
+        border-radius: 5px;
+        width: 100%;
+        padding: 8px 0;
+        align-self: center;
+        border: 0;
+        z-index: 2;
+        background-color: transparent;
+        transition: all .2s linear;
+    }
+
+    textarea {
+        height: 100px;
+    }
+
+    .deadLineContainer {
+        display: flex;
+        align-items: center;
+        margin: 20px;
+
+        h6 {
+            margin: 0;
+            margin-right: 20px;
+        }
+
+        .form-date {
+            display: relative;
+            width: 100%;
+
+            input {
+                width: 100%;
+                border-radius: 5px;
+                padding: 10px;
+                border: 0;
+                border-bottom: 1px solid black;
+                outline: 0;
+            }
+
+        }
+
+        .datepicker-label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            color: gray;
+            z-index: 1;
+        }
+    }
+    
+    
+    .form-button {
+        margin: 30px 0;
+        padding: 10px;
+        border-radius: 20px;
+        width: 50%;
+        align-self: center;
+    }
+
+    .priorityCont {
+        display: flex;
+        flex-direction: row;
+        align-self: center;
+        margin: 10px 0;
+
+        .radioCont {
+            display: flex;
+            flex-direction: column;
+            margin: 0 1vw;
+        }
+    }
+
+    .usersContainer {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        margin: 15px 0;
+    }
+}
+
+.createTaskContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.46);
+}
+
+.form-el {
+    display: flex;
+    align-self: center;
+    position: relative;
+    width: 80%;
+    margin: 10px 20px;
+
+    .input-label {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        transition: all .2s linear;
+        color: gray;
+        z-index: 1;
+    }
+
+    .form-input:focus + .input-label{
+        top: -12px;
+        color: black;
+        z-index: 3;
+    }
+
+    .form-input:focus + .input-filled {
+        color: black;
+    }
+
+}
+
+.input-filled {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    transition: all .2s linear;
+    color: gray;
+    z-index: 1;
+}
+
+
+.react-datepicker__tab-loop {
+    z-index: 4;
+}
+
+.backgroundContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
