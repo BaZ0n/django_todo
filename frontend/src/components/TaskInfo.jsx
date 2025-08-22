@@ -219,11 +219,15 @@ function TaskInfo({task, toReload}) {
                                 variants={dropdown_menu_show}
                                 transition={{duration: 0.5}}
                             >   
-                                {task.status == 0 ? 
-                                    <li className="dropdown_menu-element" onClick={() => changeStatus(1)}>Начать выполнение</li>
+                                {task.status == 0 
+                                    ? <li className="dropdown_menu-element" onClick={() => changeStatus(1)}>Начать выполнение</li>
                                     : <li className="dropdown_menu-element" onClick={() => changeStatus(2)}>Выполнить</li>
                                 }
-                                <li className="dropdown_menu-element" onClick={() => changeStatus(3)}>В архив</li>
+                                {task.status != 3 
+                                    ? <li className="dropdown_menu-element" onClick={() => changeStatus(3)}>В архив</li>
+                                    : <li className="dropdown_menu-element" onClick={() => changeStatus(3)}>Вернуть</li>
+                                }
+                                
                                 <li className="dropdown_menu-element">Отказаться</li>
                             </motion.ul>
                         : null}
